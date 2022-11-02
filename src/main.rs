@@ -21,11 +21,16 @@ async fn main() {
     }
     pretty_env_logger::init();
 
-    let api_config_data = fs::read_to_string("./api_config.json")
+    let api_config_file =
+        env::var_os("API_CONFIG_FILE").unwrap_or_else(|| "./api_config.json".parse().unwrap());
+
+    println!("Loading api config from file {:?}", api_config_file.clone());
+
+    let api_config_data = fs::read_to_string(api_config_file.clone())
         .await
         .expect("Could not read file api_config.json file");
-    let api_config: RestApiConfig =
-        serde_json::from_str(&api_config_data).expect("Could not parse api_config.json contents");
+    let api_config: RestApiConfig = serde_json::from_str(&api_config_data)
+        .unwrap_or_else(|_| panic!("Could not parse {:?} contents", api_config_file.clone()));
 
     let api_routes = filters::rest_smtp_api(api_config);
     let api_routes = api_routes.with(warp::log("rest_smtp"));
