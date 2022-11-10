@@ -35,5 +35,5 @@ async fn main() {
     let api_routes = filters::rest_smtp_api(api_config);
     let api_routes = api_routes.with(warp::log("rest_smtp"));
 
-    warp::serve(api_routes).run(([127, 0, 0, 1], 9002)).await;
+    warp::serve(api_routes).run(([0, 0, 0, 0], 9002)).await;
 }
